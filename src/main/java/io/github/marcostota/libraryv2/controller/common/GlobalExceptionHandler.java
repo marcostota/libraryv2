@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import io.github.marcostota.libraryv2.controller.dto.ErroCampo;
 import io.github.marcostota.libraryv2.controller.dto.ErroResposta;
+import io.github.marcostota.libraryv2.exceptions.CampoInvalidoException;
 import io.github.marcostota.libraryv2.exceptions.OperacaoNaoPermitidaException;
 import io.github.marcostota.libraryv2.exceptions.RegistroDuplicadoException;
 
@@ -51,4 +52,12 @@ public class GlobalExceptionHandler {
                 List.of());
     }
 
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(CampoInvalidoException.class)
+    public ErroResposta handleCampoInvalidoException(CampoInvalidoException e) {
+        return new ErroResposta(
+                HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                "Erro de validacao",
+                List.of(new ErroCampo(e.getCampo(), e.getMessage())));
+    }
 }

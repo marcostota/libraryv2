@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +14,7 @@ import io.github.marcostota.libraryv2.entity.GeneroLivro;
 import io.github.marcostota.libraryv2.entity.Livro;
 import io.github.marcostota.libraryv2.repository.LivroRepository;
 import io.github.marcostota.libraryv2.repository.specs.LivroSpecs;
+import io.github.marcostota.libraryv2.validator.LivroValidator;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,8 +22,10 @@ import lombok.RequiredArgsConstructor;
 public class LivroService {
 
     private final LivroRepository livroRepository;
+    private final LivroValidator livroValidator;
 
     public Livro salvar(Livro livro) {
+        livroValidator.validar(livro);
         return livroRepository.save(livro);
 
     }
@@ -32,8 +38,8 @@ public class LivroService {
         livroRepository.delete(livro);
     }
 
-    public List<Livro> pesquisa(String isbn, String titulo, String nomeAutor, GeneroLivro generoLivro,
-            Integer anoPublicacao) {
+    public Page<Livro> pesquisa(String isbn, String titulo, String nomeAutor, GeneroLivro generoLivro,
+            Integer anoPublicacao, Integer pagina, Integer tamanhoPagina) {
 
         Specification<Livro> specs = Specification.where((root, query, cb) -> cb.conjunction());
 
@@ -57,7 +63,18 @@ public class LivroService {
             specs = specs.and(LivroSpecs.nomeAutorLike(nomeAutor));
         }
 
-        return livroRepository.findAll(specs);
+        Pageable pageableRequest = PageRequest.of(pagina, tamanhoPagina);
+
+        return livroRepository.findAll(specs, pageableRequest);
 
     }
+
+    public void atualizar(Livro livro) {
+        if (livro.getId() == null) {
+            throw new IllegalArgumentException("para atualizar e necessario livro cadastrado");
+        }
+        livroValidator.validar(livro);
+        livroRepository.save(livro);
+    }
+
 }
