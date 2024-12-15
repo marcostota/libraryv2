@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: libraryv2
+  datasource:
+    url: jdbc:postgresql://localhost:5432/library
+    username: tota
+    password: tota
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update  # Options: none, validate, update, create, create-drop
+    show-sql: true     
+
+#docker run  -p 5432:5432 -e POSTGRES_PASSWORD=tota -e POSTGRES_USER=tota -e POSTGRES_DB=library postgres:16.6-alpine3.21
