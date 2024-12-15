@@ -44,7 +44,7 @@ public class Livro {
     private LocalDate dataPublicacao;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "genero")
+    @Column(name = "generoLivro")
     private GeneroLivro generoLivro;
 
     @Column(name = "preco")

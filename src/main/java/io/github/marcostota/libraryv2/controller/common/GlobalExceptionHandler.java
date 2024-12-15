@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import io.github.marcostota.libraryv2.controller.dto.ErroCampo;
 import io.github.marcostota.libraryv2.controller.dto.ErroResposta;
+import io.github.marcostota.libraryv2.exceptions.OperacaoNaoPermitidaException;
+import io.github.marcostota.libraryv2.exceptions.RegistroDuplicadoException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -26,4 +28,27 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toList());
         return new ErroResposta(HttpStatus.UNPROCESSABLE_ENTITY.value(), "Erro de validacao", listaErros);
     }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(RegistroDuplicadoException.class)
+    public ErroResposta handleRegistroDuplicadoException(RegistroDuplicadoException e) {
+        return ErroResposta.conflito(e.getMessage());
+
+    }
+
+    @ExceptionHandler(OperacaoNaoPermitidaException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErroResposta handleOperacaoNaoPermitidaException(OperacaoNaoPermitidaException e) {
+        return ErroResposta.conflito(e.getMessage());
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErroResposta hadlerErrosNaoEsperado(RuntimeException e) {
+        return new ErroResposta(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Houve um erro",
+                List.of());
+    }
+
 }

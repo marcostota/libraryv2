@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.github.marcostota.libraryv2.controller.dto.AutorDTO;
 import io.github.marcostota.libraryv2.controller.mappers.AutorMapper;
@@ -28,21 +27,16 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("autores")
 @RequiredArgsConstructor
-public class AutorController {
+public class AutorController implements GenericController {
 
     private final AutorService autorService;
     private final AutorMapper autorMapper;
 
     @PostMapping
     public ResponseEntity<?> salvar(@RequestBody @Valid AutorDTO autorDTO) {
-        // Autor autorEntidade = autorDTO.mapearParaAutor();
         Autor autorEntidade = autorMapper.toEntity(autorDTO);
-
         autorService.salvar(autorEntidade);
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(autorEntidade.getId()).toUri();
-
+        URI location = gerarHeaderLocation(autorEntidade.getId());
         return ResponseEntity.created(location).build();
     }
 
